@@ -3,7 +3,8 @@
 # The Coccinelle source code can be obtained at http://coccinelle.lip6.fr
 
 COCCIDIR=../..
--include $(COCCIDIR)/Makefile.config
+include $(COCCIDIR)/Makefile.config
+include $(adjusted_build_parameters)
 -include $(COCCIDIR)/Makefile.local
 
 all:

@@ -29,6 +29,8 @@ dnl  and paths can be given explicitly via commandline parameters or
 dnl  environment variables.
 dnl
 
+AC_PATH_PROG([PYTHON],[python],
+             AC_MSG_ERROR([cannot configure this software without help by Python]))
 
 dnl
 dnl  Basic tools
@@ -469,6 +471,7 @@ dnl  generating configuration
 dnl
 
 AC_CONFIG_FILES([
+  adjust_build_parameters.py
   Makefile.config
   version.ml
   commons/commands.ml

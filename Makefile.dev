@@ -44,7 +44,7 @@ RELEASE=$(shell echo $(BRANCH) | cut -f1 -d'-')
 CODENAME=$(shell echo $(BRANCH) | cut -f2 -d'-')
 IDX?=1
 
-.PHONY:: ubuntu
+.PHONY: ubuntu
 
 ubuntu:
 	@echo "Preparing package for Ubuntu $(CODENAME) - $(RELEASE)"

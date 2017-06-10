@@ -8,6 +8,7 @@
 #TARGET=matcher
 ifneq ($(MAKECMDGOALS),distclean)
 include ../Makefile.config
+include $(adjusted_build_parameters)
 -include ../Makefile.local
 endif
 

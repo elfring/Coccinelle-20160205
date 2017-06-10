@@ -1,0 +1,53 @@
+# This file is part of Coccinelle, licenced under the terms of the GPL v2.
+# See copyright.txt in the Coccinelle source code for more information.
+# The Coccinelle source code can be obtained at http://coccinelle.lip6.fr
+
+import sys, os.path as P
+parameters = [
+(3, "SHELL", "@SHELL@"),
+(2, "PKG_CONFIG", "@PKG_CONFIG@"),
+(2, "INSTALL", "@INSTALL@"),
+(2, "TAR", "@TAR@"),
+(2, "PATCH", "@PATCH@"),
+(2, "ECHO", "@ECHO@"),
+(2, "PDFLATEX", "@PDFLATEX@"),
+(2, "PATCHELF", "@PATCHELF@"),
+(2, "export OCAMLFIND", "@OCAMLFIND@"),
+(2, "export OCAMLC", "@OCAMLC@"),
+(2, "export OCAMLDEP", "@OCAMLDEP@"),
+(2, "export OCAMLDOC", "@OCAMLDOC@"),
+(2, "export OCAMLLEX", "@OCAMLLEX@"),
+(2, "export OCAMLYACC", "@OCAMLYACC@"),
+(2, "export OCAMLLIB", "@OCAMLLIB@"),
+(2, "export OCAMLMKLIB", "@OCAMLMKLIB@"),
+(2, "export OCAMLMKTOP", "@OCAMLMKTOP@"),
+(2, "export OCAMLOPT", "@OCAMLOPT@"),
+(2, "export MENHIR", "@MENHIR@"),
+(1, """INSTALL_PROGRAM=${INSTALL} -m 755
+INSTALL_LIB=${INSTALL} -m 755
+INSTALL_DATA=${INSTALL} -m 644"""),
+(2, "PCREDIR", "@PATH_pcre@"),
+(2, "PARMAPDIR", "@PATH_parmap@"),
+(2, "PYMLDIR", "@PATH_pyml@"),
+(2, "MENHIRDIR", "@PATH_menhirLib@"),
+(2, "DYNLINKDIR", "@PATH_dynlink@"),
+(2, "BYTESDIR", "@PATH_bytes@")
+]
+results = []
+pair = ['', '']
+
+for parameter in parameters:
+   if parameter[0] == 2:
+      pair[0] = parameter[1]
+      pair[1] = P.abspath(parameter[2]) if parameter[2] != '' else ''
+      results.append(":=".join(pair))
+   elif parameter[0] == 1:
+      results.append(parameter[1])
+   elif parameter[0] == 3:
+      pair[0] = parameter[1]
+      pair[1] = P.abspath(parameter[2]) if parameter[2] != '' else ''
+      results.append("?=".join(pair))
+   else:
+      raise RuntimeError("make script generation: Parameter with unexpected action code: " + str(parameter[0]))
+
+sys.stdout.write("\n".join(results))

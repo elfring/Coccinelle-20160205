@@ -127,6 +127,7 @@ $(foreach SOURCE,$(MENHIRLIB_MODULES),$(eval $(bundle_without_mli)))
 
 ifneq ($(MAKECMDGOALS),distclean)
 include ../../Makefile.config
+include $(adjusted_build_parameters)
 -include ../../Makefile.local
 endif
 

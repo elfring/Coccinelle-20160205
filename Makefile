@@ -14,7 +14,8 @@ ifeq ($(MAKECMDGOALS),distclean)
 MAKELIBS:=$(dir $(wildcard ./bundles/*/Makefile))
 else
 ifneq ($(MAKECMDGOALS),configure)
--include Makefile.config
+include Makefile.config
+include $(adjusted_build_parameters)
 -include Makefile.local
 endif
 endif
@@ -106,10 +107,16 @@ BYTECODE_EXTRA=-custom $(EXTRA_OCAML_FLAGS)
 ##############################################################################
 # Top rules
 ##############################################################################
-.PHONY:: all all.opt byte opt top clean distclean opt-compil
-.PHONY:: $(MAKELIBS:%=%.all) $(MAKESUBDIRS:%=%.all) $(MAKELIBS:%=%.opt) $(MAKESUBDIRS:%=%.opt) subdirs.all subdirs.opt
-.PHONY:: byte-only opt-only pure-byte tools
-.PHONY:: copy-stubs install-stubs install install-man install-python install-common
+.PHONY: all all.opt byte opt top clean distclean opt-compil \
+        $(MAKELIBS:%=%.all) $(MAKESUBDIRS:%=%.all) $(MAKELIBS:%=%.opt) $(MAKESUBDIRS:%=%.opt) \
+        subdirs.all subdirs.opt byte-only opt-only pure-byte tools \
+        copy-stubs install-stubs install install-man install-python install-common \
+        adjust_build_parameters
+
+adjust_build_parameters_script:=adjust_build_parameters.py
+adjust_build_parameters_tool:=$(PYTHON)
+adjusted_build_parameters_deps:=Makefile.config $(adjust_build_parameters_script)
+common_deps:=$(adjusted_build_parameters_deps) version.ml
 
 # All make targets that are expected to be an entry point have a dependency on
 # 'Makefile.config' to ensure that if Makefile.config is not present, an error
@@ -118,12 +125,12 @@ BYTECODE_EXTRA=-custom $(EXTRA_OCAML_FLAGS)
 # '.depend' and 'version.ml'.
 
 # dispatches to either 'all-dev' or 'all-release'
-all: Makefile.config
+all: $(adjusted_build_parameters_deps)
 	@$(MAKE) .depend
 	$(MAKE) $(TARGET_ALL)
 
 # make "all" comes in three flavours
-world: Makefile.config version.ml
+world: $(common_deps)
 	@$(ECHO) "Building both versions of spatch"
 	$(MAKE) .depend
 	$(MAKE) byte
@@ -133,14 +140,14 @@ world: Makefile.config version.ml
 	@$(ECHO) -e "\n\tcoccinelle can now be installed via 'make install'"
 
 # note: the 'all-dev' target excludes the documentation
-all-dev: Makefile.config version.ml
+all-dev: $(common_deps)
 	@$(MAKE) .depend
 	@$(ECHO) "Building $(TARGET_SPATCH)"
 	$(MAKE) $(TARGET_SPATCH)
 	@$(MAKE) preinstall
 	@$(ECHO) -e "\n\tcoccinelle can now be installed via 'make install'"
 
-all-release: Makefile.config version.ml
+all-release: $(common_deps)
 	@$(ECHO) "Building $(TARGET_SPATCH)"
 	$(MAKE) .depend
 	$(MAKE) $(TARGET_SPATCH)
@@ -148,19 +155,19 @@ all-release: Makefile.config version.ml
 #	$(MAKE) docs
 	@$(ECHO) -e "\n\tcoccinelle can now be installed via 'make install'"
 
-all.opt: Makefile.config
+all.opt: $(adjusted_build_parameters_deps)
 	@$(MAKE) .depend
 	$(MAKE) opt-only
 	$(MAKE) preinstall
 
-byte: Makefile.config version.ml
+byte: $(common_deps)
 	@$(MAKE) .depend
 	@$(MAKE) subdirs.all
 	@$(MAKE) $(EXEC)
 	@$(ECHO) "The compilation of $(EXEC) finished."
 	@$(ECHO) "$(EXEC) can be installed or used."
 
-opt-compil: Makefile.config version.ml
+opt-compil: $(common_deps)
 	$(MAKE) .depend
 	$(MAKE) subdirs.opt BUILD_OPT=yes
 	$(MAKE) $(EXEC).opt BUILD_OPT=yes
@@ -169,10 +176,13 @@ opt-compil: Makefile.config version.ml
 
 top: $(EXEC).top
 
+adjust_build_parameters $(adjusted_build_parameters): $(adjusted_build_parameters_deps)
+	$(adjust_build_parameters_tool) $(adjust_build_parameters_script) > $(adjusted_build_parameters)
+
 # the .cmi file of coccilib
 # aliases for "byte" and "opt-compil"
-opt opt-only: Makefile.config opt-compil
-byte-only: Makefile.config byte
+opt opt-only: $(adjusted_build_parameters_deps) opt-compil
+byte-only: $(adjusted_build_parameters_deps) byte
 
 subdirs.all:
 	@+for D in $(MAKELIBS) $(MAKESUBDIRS); do $(MAKE) $$D.all || exit 1 ; done
@@ -189,7 +199,7 @@ $(MAKELIBS:%=%.opt) $(MAKESUBDIRS:%=%.opt):
 # This make target prepares the bundled software for building.
 # Note that running 'make' in these subdirectories will
 # automatically prepare the bundled software.
-.PHONY:: prepare-bundles
+.PHONY: prepare-bundles
 prepare-bundles: $(MAKELIBS:%=%/.prepare)
 
 $(MAKELIBS:%=%/.prepare):
@@ -208,7 +218,7 @@ $(MAKELIBS:%=%/.prepare):
 # extra: parsing_cocci parsing_c ctl
 # python:pyml parsing_cocci parsing_c
 
-clean:: Makefile.config
+clean:: $(adjusted_build_parameters_deps)
 	@set -e; for i in $(CLEANSUBDIRS); do $(MAKE) -C $$i $@; done
 	@$(MAKE) -C demos/spp $@
 
@@ -282,7 +292,7 @@ version.ml:
 ##############################################################################
 # Build documentation
 ##############################################################################
-.PHONY:: docs
+.PHONY: docs
 
 docs:
 	@$(MAKE) -C docs || ($(ECHO) "Warning: ignored the failed construction of the manual" 1>&2)
@@ -540,7 +550,7 @@ distclean::
 	rm -f setup/Makefile
 
 # using 'touch' to prevent infinite recursion with 'make depend'
-.PHONY:: depend
+.PHONY: depend
 .depend: Makefile.config version
 	@touch .depend
 	@$(MAKE) depend

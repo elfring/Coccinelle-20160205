@@ -5,10 +5,14 @@
 # path to coccinelle source
 COCCIDIR=../../..
 SCRIPTDIR=../scripts
+CONFIG=$(COCCIDIR)/Makefile.config
 
 # do not raise error if config does not exist; handle in $(CONFIG) rule below
 include $(COCCIDIR)/Makefile.libs
--include $(COCCIDIR)/Makefile.config
+-include $(CONFIG)
+ifneq ($(strip $(adjusted_build_parameters)),)
+-include $(adjusted_build_parameters)
+endif
 -include $(COCCIDIR)/Makefile.local
 
 # where to install the program
@@ -19,8 +23,6 @@ INSTALLDIR=$(DESTDIR)$(LIBDIR)/spgen
 ##############################################################################
 
 TARGET=spgen
-
-CONFIG= $(COCCIDIR)/Makefile.config
 
 SYSLIBS= str unix bigarray nums
 SYSLIBS_BC = $(SYSLIBS:=.cma)

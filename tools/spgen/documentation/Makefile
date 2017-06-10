@@ -8,6 +8,7 @@
 ifneq ($(MAKECMDGOALS),distclean)
 ifneq ($(MAKECMDGOALS),clean)
 include ../../../Makefile.config
+include $(adjusted_build_parameters)
 -include ../../../Makefile.local
 endif
 endif
