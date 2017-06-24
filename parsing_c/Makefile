@@ -57,7 +57,7 @@ OPTFLAGS ?= -g
 
 OCAMLC_CMD=$(OCAMLC) $(OCAMLCFLAGS) $(INCLUDES)
 OCAMLOPT_CMD=$(OCAMLOPT) $(OPTFLAGS) $(INCLUDES)
-OCAMLDEP_CMD=$(OCAMLDEP) $(INCLUDESDEP)
+OCAMLDEP_CMD=$(OCAMLDEP) -one-line $(INCLUDESDEP)
 OCAMLMKTOP_CMD=$(OCAMLMKTOP) -g -custom $(INCLUDES)
 
 OBJS = $(SRC:.ml=.cmo)
@@ -131,12 +131,9 @@ locindiv:
 
 .SUFFIXES: .ml .mli .cmo .cmi .cmx
 
-.ml.cmo:
-	$(OCAMLC_CMD) -c $<
-.mli.cmi:
-	$(OCAMLC_CMD) -c $<
-.ml.cmx:
-	$(OCAMLOPT_CMD) -c $<
+ifneq ($(strip $(abs_top_srcdir)),)
+include $(abs_top_srcdir)/modules_without_mli.make
+endif
 
 clean::
 	rm -f *.cm[ioxa] *.o *.a *.cmxa *.annot
@@ -147,6 +144,10 @@ distclean: clean
 
 .depend depend: lexer_c.ml parser_c.ml parser_c.mli
 	$(OCAMLDEP_CMD) *.mli *.ml > .depend
+
+.PHONY: mli_deps
+mli_deps:
+	$(OCAMLDEP_CMD) *.mli > mli-dependencies.txt
 
 ifneq ($(MAKECMDGOALS),clean)
 ifneq ($(MAKECMDGOALS),distclean)

@@ -61,15 +61,15 @@ clean::
 .SUFFIXES:
 .SUFFIXES: .ml .mli .cmo .cmi .cmx
 
-.ml.cmo:
+ifneq ($(strip $(abs_top_srcdir)),)
+include $(abs_top_srcdir)/common_rules.make
+
+ast_popl.cmo flag_popl.cmo: %.cmo: %.ml
 	$(OCAMLC_CMD) -c $<
 
-.mli.cmi:
-	$(OCAMLC_CMD) -c $<
-
-.ml.cmx:
+ast_popl.cmx flag_popl.cmx: %.cmx: %.ml
 	$(OCAMLOPT_CMD) -c $<
-
+endif
 
 # clean rule for others files
 clean::

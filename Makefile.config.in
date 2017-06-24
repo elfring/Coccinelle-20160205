@@ -51,6 +51,7 @@ includedir=@includedir@
 libdir=@libdir@
 sysconfdir=@sysconfdir@
 mandir=@mandir@
+abs_top_srcdir::=@abs_top_srcdir@
 
 # C compiler
 export CC=@CC@

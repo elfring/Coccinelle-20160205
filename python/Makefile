@@ -107,15 +107,15 @@ distclean::
 .SUFFIXES:
 .SUFFIXES: .ml .mli .cmo .cmi .cmx
 
-.ml.cmo:
+ifneq ($(strip $(abs_top_srcdir)),)
+include $(abs_top_srcdir)/common_rules.make
+
+no_pycocci.cmo yes_pycocci.cmo: %.cmo: %.ml
 	$(OCAMLC_CMD) -c $<
 
-.mli.cmi:
-	$(OCAMLC_CMD) -c $<
-
-.ml.cmx:
+no_pycocci.cmx yes_pycocci.cmx: %.cmx: %.ml
 	$(OCAMLOPT_CMD) -c $<
-
+endif
 
 # clean rule for others files
 clean::

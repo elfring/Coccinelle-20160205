@@ -208,12 +208,15 @@ dependencygraph2:
 .SUFFIXES:
 .SUFFIXES: .ml .mli .cmo .cmi .cmx
 
-.ml.cmo:
-	$(OCAMLC_CMD)  -c $<
-.mli.cmi:
-	$(OCAMLC_CMD)  -c $<
-.ml.cmx:
-	$(OCAMLOPT_CMD)  -c $<
+ifneq ($(strip $(abs_top_srcdir)),)
+include $(abs_top_srcdir)/common_rules.make
+
+commands.cmo: commands.ml
+	$(OCAMLC_CMD) -c $<
+
+commands.cmx: commands.ml
+	$(OCAMLOPT_CMD) -c $<
+endif
 
 clean::
 	rm -f *.cm[iox] *.o *.a *.cma *.cmxa *.annot

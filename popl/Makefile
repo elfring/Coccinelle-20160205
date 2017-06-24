@@ -62,15 +62,9 @@ clean::
 .SUFFIXES:
 .SUFFIXES: .ml .mli .cmo .cmi .cmx
 
-.ml.cmo:
-	$(OCAMLC_CMD) $(INCLUDE_PATH) -c $<
-
-.mli.cmi:
-	$(OCAMLC_CMD) $(INCLUDE_PATH) -c $<
-
-.ml.cmx:
-	$(OCAMLOPT_CMD) $(INCLUDE_PATH) -c $<
-
+ifneq ($(strip $(abs_top_srcdir)),)
+include $(abs_top_srcdir)/common_rules.make
+endif
 
 # clean rule for others files
 clean::
