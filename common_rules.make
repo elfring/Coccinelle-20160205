@@ -5,10 +5,10 @@
 %.cmi: %.mli
 	$(OCAMLC_CMD) -c $<
 
-%.cmo: %.ml %.cmi
+$(OBJS): %.cmo: %.ml %.cmi
 	$(OCAMLC_CMD) -c $<
 
-%.cmx: %.ml %.cmi
+$(OPTOBJS): %.cmx: %.ml %.cmi
 	$(OCAMLOPT_CMD) -c $<
 
 %.mldepend: %.ml
