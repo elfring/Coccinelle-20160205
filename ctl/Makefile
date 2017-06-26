@@ -31,9 +31,9 @@ OCAMLMKTOP_CMD=$(OCAMLMKTOP) -g -custom $(INCLUDES)
 LIB=$(TARGET).cma
 OPTLIB=$(LIB:.cma=.cmxa)
 
-OBJS::=$(SRC_without_mli:.ml=.cmo) $(SRC_with_mli:.ml=.cmo)
-OPTOBJS::=$(SRC_without_mli:.ml=.cmx) $(SRC_with_mli:.ml=.cmx)
-
+working_order::=flag_ctl ast_ctl pretty_print_ctl ctl_engine wrapper_ctl
+OBJS::=$(addsuffix .cmo,$(working_order))
+OPTOBJS::=$(addsuffix .cmx,$(working_order))
 
 all: $(LIB)
 all.opt:
